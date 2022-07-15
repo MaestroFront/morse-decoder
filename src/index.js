@@ -5,50 +5,40 @@ const MORSE_TABLE = {
     '..---':  '2', '...--':  '3', '....-':  '4', '.....':  '5', '-....':  '6', '--...':  '7', '---..':  '8', '----.':  '9', '-----':  '0',
 };
 
-function decode(expr) {
-    let array = expr.split(','); // соединил строку в массив
-    let inputStringArray = []; // создал пустой массив для хранения вводных букв, закодированных "10" и "11"
-
-    for (let i = 0; i < array.length; i++) { // цикл для необходимого структурирования полученных элементов и добавления их в общую один массив
-        let parts = array[i].split(/(.{10})/).filter(O=>O); // разделил на части массив, чтобы побуквенно было легко найти связь с уже имеющимися данными
-        inputStringArray.push(parts); // добавил всё в пустой массив
-    }
-    inputStringArray = inputStringArray.flat(); // раскрыл все подмассивы в массиве
-
-    for (let i = 0; i < inputStringArray.length; i++) { // цикл для превращения строк в массиве в числовой формат
-        if (inputStringArray[i] === '**********') { // замена звездочек на пробел
-            inputStringArray[i] = ' ';
-        } else {
-            inputStringArray[i] = +inputStringArray[i]; // замена строк на числа (тем самым удаляются '0' в начале)
-        }
-    }
-
-    const keys = Object.keys(MORSE_TABLE); // массив ключей исходного объекта MORSE_TABLE
-    const values = Object.values(MORSE_TABLE); // массив значений исходного объекта MORSE_TABLE
-    let replace = (keys.map((item) => item.replace(/-/g, '11'))).map((item) => item.replace(/\./g, '10')); // создание и перевод массива значений (из объекта Азбуки Морзе) из '.-' в '1011'
-
-    for (let i = 0; i < replace.length; i++) { // цикл для превращения строк в числа в вводимом массиве
-        replace[i] = +replace[i]; // замена строчного формата на числовой
-    }
-
-    let result = []; // создал пустой массив для последующего добавления в него декодированных буквенных значений (a,b,c) с числовых (10,11)
-
-    for (let i = 0; i < inputStringArray.length; i++) { // наружный цикл для поиска и сопоставления вводимых элементов с данными из объекта (Азбуки Морзе)
-
-        for (let j = 0; j < replace.length; j++) { // внутренний цикл для поиска сопоставления значений в объекте
-            if (inputStringArray[i] === replace[j]) { // условие - если значение из вводимого массива с числами (10,11) есть в массиве значений объекта Азбуки Морзе
-                result.push(values[j]); // добавление в пустой массив значений (a,b,c) из объекта Азбуки Морзе
+module.exports = {
+    decode(expr) {
+        const keysArray = Object.keys(MORSE_TABLE);
+        const valuesArray = Object.values(MORSE_TABLE);
+        let array = [];
+        let result = [];
+    
+        const combineToArray = () => expr = expr.split(/(.{10})/).filter(item => item);
+        combineToArray()
+    
+        const removeZeroes = () => expr.map(item => item === '**********' ? array.push(' ') : array.push(String(+item)))
+        removeZeroes()
+    
+        const decodeToDotsAndDashes = () => array = array.map((item) => item.replace(/11/g, '-').replace(/10/g, '.'));
+        decodeToDotsAndDashes();
+    
+        const decodeToLetters = () => {
+            for (let i = 0; i < array.length; i++) {
+                if (array[i] === ' ') {
+                    result.push(array[i]);
+                }
+                for (let j = 0; j < keysArray.length; j++) {
+                    if (array[i] === keysArray[j]) {
+                        result.push(valuesArray[j])
+                    }
+                }
             }
         }
-        if (inputStringArray[i] === ' ') { // если в массиве присутствует пустая строка
-            result.push(' '); // добавление пустой строки в массив с конечными результатами
-        }
-    }
+        decodeToLetters();
     
-    result = result.join(''); // перевод массива в строку
-    return result; // вывод декодированной строки
-}
-
-module.exports = {
-    decode
+        const convertToString = () => result = result.join('');
+        convertToString();
+    
+        return result;
+    
+    }
 }
